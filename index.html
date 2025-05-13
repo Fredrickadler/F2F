@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FarKaster Like-to-Earn</title>
+  <title>FarKaster</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
@@ -30,23 +30,56 @@
       overflow: hidden;
     }
     
+    /* هدر */
+    .header {
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--gray-700);
+      position: relative;
+    }
+    .wallet-btn {
+      background: var(--primary); 
+      color: white; 
+      border: none; 
+      padding: 8px 16px;
+      border-radius: 12px; 
+      cursor: pointer; 
+      font-weight: 600; 
+      font-size: 14px;
+      transition: all 0.3s ease; 
+      display: flex; 
+      align-items: center; 
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(138, 90, 255, 0.3);
+    }
+    .wallet-btn:hover { 
+      background: var(--primary-dark); 
+      transform: translateY(-2px); 
+      box-shadow: 0 6px 25px rgba(138, 90, 255, 0.4); 
+    }
+    .wallet-btn i { font-size: 16px; }
+    .wallet-address {
+      background: var(--gray-800); 
+      padding: 8px 16px; 
+      border-radius: 12px;
+      font-size: 14px; 
+      font-weight: 500; 
+      display: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); 
+      cursor: pointer;
+    }
+    
     /* صفحه اصلی */
     .page {
       flex: 1;
       display: none;
       flex-direction: column;
-      padding: 20px;
       overflow-y: auto;
     }
     .page.active {
       display: flex;
-    }
-    
-    /* هدر */
-    .header {
-      padding: 15px 0;
-      text-align: center;
-      border-bottom: 1px solid var(--gray-700);
     }
     
     /* محتوای پست */
@@ -56,24 +89,43 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 20px 0;
+      padding: 20px;
+      position: relative;
+    }
+    .post-image-container {
+      width: 100%;
+      max-width: 500px;
+      height: 400px;
+      position: relative;
+      margin-bottom: 20px;
     }
     .post-image {
       width: 100%;
-      max-width: 400px;
-      height: 400px;
+      height: 100%;
       object-fit: cover;
       border-radius: 16px;
-      margin-bottom: 20px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
-    .post-info {
-      background: var(--gray-800);
-      padding: 20px;
-      border-radius: 12px;
+    .no-photo {
       width: 100%;
-      max-width: 400px;
-      margin-bottom: 20px;
+      height: 100%;
+      background: var(--gray-800);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--gray-400);
+    }
+    .post-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+      padding: 20px;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
     }
     .post-title {
       font-size: 20px;
@@ -86,14 +138,40 @@
       line-height: 1.5;
     }
     
+    /* نوار پیشرفت */
+    .progress-container {
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 20px;
+    }
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--gray-400);
+    }
+    .progress-bar {
+      height: 6px;
+      width: 100%;
+      background: var(--gray-700);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 65%;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+    
     /* دکمه‌های عمل */
     .action-buttons {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       width: 100%;
-      max-width: 400px;
-      margin-top: auto;
+      max-width: 500px;
     }
     .action-btn {
       background: var(--gray-800);
@@ -155,6 +233,10 @@
       background: var(--gray-800);
       border-radius: 12px;
       margin-bottom: 10px;
+      max-width: 500px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
     }
     .leaderboard-rank {
       width: 30px;
@@ -182,6 +264,7 @@
     .profile-header {
       text-align: center;
       margin-bottom: 20px;
+      padding: 0 20px;
     }
     .profile-avatar {
       width: 100px;
@@ -196,6 +279,11 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       margin-bottom: 20px;
+      padding: 0 20px;
+      max-width: 500px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
     }
     .stat-item {
       background: var(--gray-800);
@@ -212,21 +300,63 @@
       font-size: 12px;
       color: var(--gray-400);
     }
+
+    @media (max-width: 768px) {
+      .post-image-container {
+        height: 300px;
+      }
+      .post-title {
+        font-size: 18px;
+      }
+      .post-description {
+        font-size: 14px;
+      }
+      .action-btn {
+        padding: 12px;
+        font-size: 14px;
+      }
+      .tab-btn {
+        padding: 12px;
+      }
+      .tab-btn i {
+        font-size: 18px;
+      }
+    }
   </style>
 </head>
 <body>
   <!-- صفحه اصلی -->
   <div class="page active" id="home-page">
     <div class="header">
-      <h2>FarKaster Like-to-Earn</h2>
+      <div></div>
+      <button class="wallet-btn" id="connectWallet">
+        <i class="fas fa-wallet"></i> Connect Wallet
+      </button>
+      <div class="wallet-address" id="walletAddress"></div>
     </div>
     
     <div class="post-container">
-      <img src="https://i.imgur.com/muoYEIu.jpeg" class="post-image" alt="Post">
+      <div class="post-image-container">
+        <!-- تصویر پست یا جایگزین آن -->
+        <div class="no-photo">
+          📷 NO PHOTO
+        </div>
+        <!-- <img src="https://i.imgur.com/muoYEIu.jpeg" class="post-image" alt="Post"> -->
+        
+        <div class="post-overlay">
+          <h3 class="post-title">@faruser1</h3>
+          <p class="post-description">Like this post to earn 1 COIN. Verify after liking.</p>
+        </div>
+      </div>
       
-      <div class="post-info">
-        <h3 class="post-title">@faruser1</h3>
-        <p class="post-description">Like this post to earn 1 COIN. Verify after liking.</p>
+      <div class="progress-container">
+        <div class="progress-info">
+          <span>65% completed</span>
+          <span>142/220 likes</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
       </div>
       
       <div class="action-buttons">
@@ -249,10 +379,14 @@
   <!-- صفحه لیدربرد -->
   <div class="page" id="leaderboard-page">
     <div class="header">
-      <h2>Leaderboard</h2>
+      <div></div>
+      <button class="wallet-btn" id="connectWallet2">
+        <i class="fas fa-wallet"></i> Connect Wallet
+      </button>
+      <div class="wallet-address" id="walletAddress2"></div>
     </div>
     
-    <div style="padding: 20px;">
+    <div style="padding: 20px; max-width: 500px; margin: 0 auto; width: 100%;">
       <div class="leaderboard-item">
         <div class="leaderboard-rank">1</div>
         <div class="leaderboard-info">
@@ -282,10 +416,14 @@
   <!-- صفحه پروفایل -->
   <div class="page" id="profile-page">
     <div class="header">
-      <h2>Profile</h2>
+      <div></div>
+      <button class="wallet-btn" id="connectWallet3">
+        <i class="fas fa-wallet"></i> Connect Wallet
+      </button>
+      <div class="wallet-address" id="walletAddress3"></div>
     </div>
     
-    <div style="padding: 20px;">
+    <div style="max-width: 500px; margin: 0 auto; width: 100%;">
       <div class="profile-header">
         <img src="https://i.imgur.com/ABCD5678.jpg" class="profile-avatar" alt="Profile">
         <h3>@yourusername</h3>
@@ -325,6 +463,40 @@
   </div>
 
   <script>
+    // اتصال کیف پول
+    let provider, signer, address;
+
+    function setupWalletConnection(connectBtnId, addressId) {
+      const connectBtn = document.getElementById(connectBtnId);
+      const walletAddress = document.getElementById(addressId);
+
+      connectBtn.addEventListener('click', async () => {
+        try {
+          if (window.ethereum) {
+            provider = new ethers.BrowserProvider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            signer = await provider.getSigner();
+            address = await signer.getAddress();
+
+            connectBtn.style.display = 'none';
+            walletAddress.style.display = 'block';
+            walletAddress.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+          } else {
+            alert('Please install MetaMask or another Ethereum wallet.');
+          }
+        } catch (error) {
+          console.error("Wallet connection failed:", error);
+        }
+      });
+
+      walletAddress.addEventListener('click', () => {
+        connectBtn.style.display = 'inline-block';
+        walletAddress.style.display = 'none';
+        signer = null;
+        address = null;
+      });
+    }
+
     // نمایش صفحات
     function showPage(pageId) {
       document.querySelectorAll('.page').forEach(page => {
@@ -356,6 +528,27 @@
         alert('Please like the post first!');
       }
     }
+
+    // تنظیم اتصال کیف پول برای همه صفحات
+    window.addEventListener('DOMContentLoaded', () => {
+      setupWalletConnection('connectWallet', 'walletAddress');
+      setupWalletConnection('connectWallet2', 'walletAddress2');
+      setupWalletConnection('connectWallet3', 'walletAddress3');
+      
+      // شبیه‌سازی تغییر نوع دکمه عمل
+      setTimeout(() => {
+        const actionBtn = document.querySelector('.action-buttons .action-btn.primary');
+        actionBtn.innerHTML = '<i class="fas fa-user-plus"></i><span>FOLLOW</span>';
+        actionBtn.onclick = function() {
+          const confirmed = confirm('Did you follow this user on Warpcast?');
+          if (confirmed) {
+            alert('+2 COINS earned!');
+          } else {
+            alert('Please follow the user first!');
+          }
+        };
+      }, 3000);
+    });
   </script>
 </body>
 </html>
