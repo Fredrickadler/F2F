@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فارکستر کوین | افزایش تعامل با لایک و فالو</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6a0dad; /* بنفش فارکستر */
+            --secondary: #000000; /* مشکی */
+            --accent: #9c27b0; /* بنفش روشن */
+            --text: #f0f0f0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--secondary);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        
+        /* پارالاکس اسکرول */
+        .parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            z-index: -1;
+            opacity: 0.8;
+        }
+        
+        /* هدر */
+        header {
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--primary);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .wallet {
+            background: rgba(106, 13, 173, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* محتوای اصلی */
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+        
+        .post {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+        
+        .post:hover {
+            transform: translateY(-5px);
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .post-user {
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .post-content {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        
+        .post-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 0.5rem;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: rgba(106, 13, 173, 0.3);
+            color: var(--accent);
+        }
+        
+        .promote-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .promote-btn:hover {
+            background: var(--accent);
+            transform: scale(1.02);
+        }
+        
+        /* فوتر */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            margin-top: 2rem;
+            border-top: 1px solid var(--primary);
+        }
+        
+        /* انیمیشن‌ها */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating-coin {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(106, 13, 173, 0.5);
+            cursor: pointer;
+            animation: float 3s ease-in-out infinite;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <!-- پس‌زمینه پارالاکس -->
+    <div class="parallax-bg"></div>
+    
+    <!-- هدر -->
+    <header>
+        <div class="logo">فارکستر کوین</div>
+        <div class="wallet">
+            <i class="fas fa-coins"></i>
+            <span id="coin-balance">0</span> سکه
+        </div>
+    </header>
+    
+    <!-- محتوای اصلی -->
+    <div class="container">
+        <!-- پست نمونه ۱ -->
+        <div class="post">
+            <div class="post-header">
+                <img src="https://via.placeholder.com/40" alt="User" style="width: 40px; height: 40px; border-radius: 50%;">
+                <div class="post-user">کاربر فارکستر</div>
+            </div>
+            <div class="post-content">
+                این یک پست نمونه در فارکستر کوین است! با لایک و کامنت سکه بگیرید و پست خود را پروموت کنید.
+            </div>
+            <img src="https://via.placeholder.com/600x300/6a0dad/ffffff?text=FarKaster+Coin" class="post-image" alt="Post Image">
+            <div class="post-actions">
+                <button class="action-btn" onclick="likePost(1)">
+                    <i class="far fa-heart"></i> لایک (۱ سکه)
+                </button>
+                <button class="action-btn" onclick="commentPost(1)">
+                    <i class="far fa-comment"></i> کامنت (۲ سکه)
+                </button>
+                <button class="action-btn" onclick="followUser(1)">
+                    <i class="far fa-user"></i> فالو (۲ سکه)
+                </button>
+            </div>
+            <button class="promote-btn" onclick="promotePost(1)">
+                <i class="fas fa-rocket"></i> پروموت این پست (۱۰ سکه)
+            </button>
+        </div>
+        
+        <!-- پست نمونه ۲ -->
+        <div class="post">
+            <div class="post-header">
+                <img src="https://via.placeholder.com/40" alt="User" style="width: 40px; height: 40px; border-radius: 50%;">
+                <div class="post-user">کاربر فعال</div>
+            </div>
+            <div class="post-content">
+                من با این سیستم ۱۰۰ سکه جمع کردم و پست‌هایم را پروموت می‌کنم! شما هم امتحان کنید.
+            </div>
+            <div class="post-actions">
+                <button class="action-btn" onclick="likePost(2)">
+                    <i class="far fa-heart"></i> لایک (۱ سکه)
+                </button>
+                <button class="action-btn" onclick="commentPost(2)">
+                    <i class="far fa-comment"></i> کامنت (۲ سکه)
+                </button>
+                <button class="action-btn" onclick="followUser(2)">
+                    <i class="far fa-user"></i> فالو (۲ سکه)
+                </button>
+            </div>
+            <button class="promote-btn" onclick="promotePost(2)">
+                <i class="fas fa-rocket"></i> پروموت این پست (۱۰ سکه)
+            </button>
+        </div>
+    </div>
+    
+    <!-- دکمه شناور خرید سکه -->
+    <div class="floating-coin" onclick="buyCoins()">
+        <i class="fas fa-shopping-cart"></i>
+    </div>
+    
+    <!-- فوتر -->
+    <footer>
+        <p>ساخته شده با ❤️ برای فارکستر | اتصال با Warplet</p>
+    </footer>
+    
+    <!-- اسکریپت‌ها -->
+    <script>
+        // متغیرهای سکه و کاربر
+        let coins = 0;
+        
+        // بارگذاری موجودی سکه از Warplet (شبیه‌سازی)
+        function loadCoins() {
+            // در حالت واقعی، از API فارکستر دریافت می‌شود
+            coins = 50; // مقدار نمونه
+            document.getElementById('coin-balance').textContent = coins;
+        }
+        
+        // لایک پست
+        function likePost(postId) {
+            coins += 1;
+            updateCoins();
+            alert(`پست ${postId} لایک شد! ۱ سکه دریافت کردید.`);
+        }
+        
+        // کامنت پست
+        function commentPost(postId) {
+            coins += 2;
+            updateCoins();
+            alert(`پست ${postId} کامنت شد! ۲ سکه دریافت کردید.`);
+        }
+        
+        // فالو کاربر
+        function followUser(userId) {
+            coins += 2;
+            updateCoins();
+            alert(`کاربر ${userId} فالو شد! ۲ سکه دریافت کردید.`);
+        }
+        
+        // پروموت پست
+        function promotePost(postId) {
+            if (coins >= 10) {
+                coins -= 10;
+                updateCoins();
+                alert(`پست ${postId} با ۱۰ سکه پروموت شد!`);
+            } else {
+                alert("سکه کافی ندارید!");
+            }
+        }
+        
+        // خرید سکه
+        function buyCoins() {
+            const amount = prompt("چه تعداد سکه می‌خواهید خریداری کنید؟ (هر ۱۰۰۰ سکه = ۱ دلار)");
+            if (amount && !isNaN(amount)) {
+                coins += parseInt(amount);
+                updateCoins();
+                alert(`${amount} سکه خریداری شد!`);
+            }
+        }
+        
+        // به‌روزرسانی نمایش سکه
+        function updateCoins() {
+            document.getElementById('coin-balance').textContent = coins;
+        }
+        
+        // بارگذاری اولیه
+        window.onload = loadCoins;
+    </script>
+</body>
+</html>
