@@ -1,279 +1,369 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FarKaster Coin | Like-to-Earn</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --dark-black: rgba(10, 10, 10, 0.9); /* مشکی نوک مدادی */
-            --far-purple: #4b0082; /* بنفش تیره فارکستر */
-            --far-light: #7b2cbf; /* بنفش روشن */
-            --text-white: #ffffff;
-            --text-gray: #b0b0b0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarKaster Like-to-Earn</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --dark-black: rgba(15, 15, 15, 0.95);
+      --far-purple: #4b0082;
+      --far-light: #7b2cbf;
+      --text-white: #ffffff;
+      --text-gray: #b0b0b0;
+    }
 
-        body {
-            background-color: #000;
-            color: var(--text-white);
-            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
 
-        /* نوار بالایی */
-        .top-bar {
-            background: var(--dark-black);
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--far-purple);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-        }
+    body {
+      background-color: #000;
+      color: var(--text-white);
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        .logo {
-            font-weight: bold;
-            color: var(--far-light);
-            font-size: 1.2rem;
-        }
+    /* انیمیشن ستاره‌ها */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
 
-        .wallet {
-            background: rgba(75, 0, 130, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
+    .star {
+      position: absolute;
+      background: rgba(138, 90, 255, 0.7);
+      border-radius: 50%;
+      animation: twinkle 3s infinite ease-in-out;
+    }
 
-        /* محتوای اصلی */
-        .feed {
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
 
-        .post {
-            background: var(--dark-black);
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-            border: 1px solid rgba(75, 0, 130, 0.5);
-            position: relative;
-        }
+    /* محتوای اصلی */
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+    }
 
-        .post-image {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+    /* پست‌ها */
+    .post {
+      background: var(--dark-black);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(75, 0, 130, 0.5);
+      position: relative;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
 
-        .post-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-            padding: 1rem;
-            color: var(--text-white);
-        }
+    .post-image {
+      width: 100%;
+      display: block;
+    }
 
-        .post-user {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+    .post-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+      padding: 15px;
+    }
 
-        .post-text {
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            color: var(--text-gray);
-        }
+    .post-user {
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        .post-stats {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.8rem;
-            color: var(--text-gray);
-        }
+    .post-text {
+      font-size: 14px;
+      color: var(--text-gray);
+      margin-bottom: 10px;
+    }
 
-        .post-actions {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.8rem;
-            background: rgba(75, 0, 130, 0.2);
-        }
+    .post-stats {
+      display: flex;
+      gap: 15px;
+      font-size: 12px;
+      color: var(--text-gray);
+    }
 
-        .action-btn {
-            background: var(--far-purple);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+    .post-actions {
+      display: flex;
+      padding: 12px;
+      background: rgba(75, 0, 130, 0.2);
+      gap: 10px;
+    }
 
-        .action-btn:hover {
-            background: var(--far-light);
-            transform: scale(1.02);
-        }
+    .action-btn {
+      flex: 1;
+      background: var(--far-purple);
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
 
-        .action-btn.secondary {
-            background: transparent;
-            border: 1px solid var(--far-purple);
-        }
+    .action-btn:hover {
+      background: var(--far-light);
+      transform: translateY(-2px);
+    }
 
-        /* هشدار */
-        .alert {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 50, 50, 0.9);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            z-index: 1000;
-            display: none;
-        }
-    </style>
+    /* دکمه اتصال ولت */
+    .connect-wallet {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--far-purple);
+      color: white;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 15px rgba(75, 0, 130, 0.5);
+      z-index: 100;
+      transition: all 0.3s;
+    }
+
+    .connect-wallet:hover {
+      background: var(--far-light);
+      transform: scale(1.1);
+    }
+
+    /* پاپ‌آپ ولت */
+    .wallet-popup {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background: var(--dark-black);
+      border: 1px solid var(--far-purple);
+      border-radius: 12px;
+      padding: 15px;
+      width: 250px;
+      display: none;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.7);
+      z-index: 100;
+    }
+
+    .wallet-popup.show {
+      display: block;
+    }
+
+    .wallet-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    .wallet-option:hover {
+      background: rgba(75, 0, 130, 0.3);
+    }
+
+    .wallet-icon {
+      font-size: 20px;
+    }
+
+    /* اسپینر */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: var(--far-light);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-    <!-- نوار بالایی -->
-    <div class="top-bar">
-        <div class="logo">FarKaster Coin</div>
-        <div class="wallet">
-            <i class="fas fa-coins"></i>
-            <span id="coin-balance">0</span> COIN
+  <!-- انیمیشن ستاره‌ها -->
+  <div class="stars" id="stars"></div>
+
+  <!-- محتوای اصلی -->
+  <div class="container">
+    <!-- پست نمونه ۱ -->
+    <div class="post">
+      <img src="https://i.imgur.com/muoYEIu.jpeg" class="post-image" alt="NFT Post">
+      <div class="post-overlay">
+        <div class="post-user">
+          <i class="fas fa-user"></i>
+          @faruser1
         </div>
+        <div class="post-text">
+          Like this post to earn rewards! Click verify after liking.
+        </div>
+        <div class="post-stats">
+          <span><i class="far fa-heart"></i> 142/500</span>
+          <span><i class="fas fa-bolt"></i> 1 REWARD</span>
+        </div>
+      </div>
+      <div class="post-actions">
+        <button class="action-btn" onclick="viewPost(1)">
+          <i class="fas fa-external-link-alt"></i> View
+        </button>
+        <button class="action-btn" onclick="verifyLike(1)">
+          <i class="fas fa-check-circle"></i> Verify
+        </button>
+      </div>
     </div>
 
-    <!-- هشدار -->
-    <div class="alert" id="alert">Please LIKE the post first!</div>
-
-    <!-- فید پست‌ها -->
-    <div class="feed">
-        <!-- پست نمونه (مثل Warpcast) -->
-        <div class="post" id="post-1">
-            <img src="https://i.imgur.com/XYZ1234.jpg" class="post-image" alt="NFT Post">
-            <div class="post-overlay">
-                <div class="post-user">
-                    <i class="fas fa-user"></i>
-                    @fredrickadler
-                </div>
-                <div class="post-text">
-                    Check out my new FarKaster NFT collection! Like & Earn coins.
-                </div>
-                <div class="post-stats">
-                    <span><i class="far fa-heart"></i> 142/500</span>
-                    <span><i class="fas fa-coins"></i> +1 COIN per LIKE</span>
-                </div>
-            </div>
-            <div class="post-actions">
-                <button class="action-btn secondary" onclick="viewPost(1)">
-                    <i class="fas fa-external-link-alt"></i> View
-                </button>
-                <button class="action-btn" onclick="verifyLike(1)">
-                    <i class="fas fa-check-circle"></i> Verify Like
-                </button>
-            </div>
+    <!-- پست نمونه ۲ -->
+    <div class="post">
+      <img src="https://i.imgur.com/ABCD5678.jpg" class="post-image" alt="NFT Post 2">
+      <div class="post-overlay">
+        <div class="post-user">
+          <i class="fas fa-user"></i>
+          @faruser2
         </div>
-
-        <!-- پست دوم -->
-        <div class="post" id="post-2">
-            <img src="https://i.imgur.com/ABCD5678.jpg" class="post-image" alt="NFT Post 2">
-            <div class="post-overlay">
-                <div class="post-user">
-                    <i class="fas fa-user"></i>
-                    @cryptogod
-                </div>
-                <div class="post-text">
-                    Daily reward: Like this post and get 2 COINs!
-                </div>
-                <div class="post-stats">
-                    <span><i class="far fa-heart"></i> 89/200</span>
-                    <span><i class="fas fa-coins"></i> +2 COINs</span>
-                </div>
-            </div>
-            <div class="post-actions">
-                <button class="action-btn secondary" onclick="viewPost(2)">
-                    <i class="fas fa-external-link-alt"></i> View
-                </button>
-                <button class="action-btn" onclick="verifyLike(2)">
-                    <i class="fas fa-check-circle"></i> Verify Like
-                </button>
-            </div>
+        <div class="post-text">
+          Double rewards today! Like and get 2x points.
         </div>
+        <div class="post-stats">
+          <span><i class="far fa-heart"></i> 89/200</span>
+          <span><i class="fas fa-bolt"></i> 2 REWARDS</span>
+        </div>
+      </div>
+      <div class="post-actions">
+        <button class="action-btn" onclick="viewPost(2)">
+          <i class="fas fa-external-link-alt"></i> View
+        </button>
+        <button class="action-btn" onclick="verifyLike(2)">
+          <i class="fas fa-check-circle"></i> Verify
+        </button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // متغیرهای سیستم
-        let coins = 50;
-        let likeAttempts = {};
+  <!-- دکمه اتصال ولت -->
+  <button class="connect-wallet" onclick="toggleWalletPopup()">
+    <i class="fas fa-wallet"></i>
+  </button>
+
+  <!-- پاپ‌آپ ولت -->
+  <div class="wallet-popup" id="walletPopup">
+    <div class="wallet-option" onclick="connectWallet('metamask')">
+      <i class="fab fa-ethereum wallet-icon"></i>
+      <span>MetaMask</span>
+    </div>
+    <div class="wallet-option" onclick="connectWallet('walletconnect')">
+      <i class="fas fa-link wallet-icon"></i>
+      <span>WalletConnect</span>
+    </div>
+    <div class="wallet-option" onclick="connectWallet('coinbase')">
+      <i class="fab fa-bitcoin wallet-icon"></i>
+      <span>Coinbase Wallet</span>
+    </div>
+  </div>
+
+  <script>
+    // ایجاد ستاره‌ها
+    function createStars() {
+      const starsContainer = document.getElementById('stars');
+      for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.width = `${Math.random() * 3 + 1}px`;
+        star.style.height = star.style.width;
+        star.style.animationDelay = `${Math.random() * 3}s`;
+        starsContainer.appendChild(star);
+      }
+    }
+
+    // نمایش/پنهان کردن پاپ‌آپ ولت
+    function toggleWalletPopup() {
+      document.getElementById('walletPopup').classList.toggle('show');
+    }
+
+    // اتصال ولت
+    function connectWallet(walletType) {
+      const popup = document.getElementById('walletPopup');
+      const connectBtn = document.querySelector('.connect-wallet');
+      
+      // شبیه‌سازی اتصال
+      connectBtn.innerHTML = '<div class="spinner"></div>';
+      popup.classList.remove('show');
+      
+      setTimeout(() => {
+        connectBtn.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => {
+          connectBtn.innerHTML = '<i class="fas fa-wallet"></i>';
+        }, 2000);
+      }, 1500);
+      
+      alert(`Connecting ${walletType} wallet...`);
+    }
+
+    // مشاهده پست
+    function viewPost(postId) {
+      window.open(`https://warpcast.com/faruser${postId}/0x0a6d75f4`, '_blank');
+    }
+
+    // تأیید لایک
+    function verifyLike(postId) {
+      const hasLiked = confirm(`Did you LIKE post #${postId} on Warpcast?`);
+      
+      if (!hasLiked) {
+        alert("Please like the post first before verifying!");
+        return;
+      }
+      
+      // شبیه‌سازی دریافت پاداش
+      const reward = postId === 2 ? 2 : 1;
+      alert(`✅ Success! You earned ${reward} reward(s)`);
+    }
+
+    // بارگذاری اولیه
+    window.addEventListener('DOMContentLoaded', () => {
+      createStars();
+      
+      // بستن پاپ‌آپ با کلیک خارج از آن
+      document.addEventListener('click', (e) => {
+        const popup = document.getElementById('walletPopup');
+        const connectBtn = document.querySelector('.connect-wallet');
         
-        // بارگذاری اولیه
-        document.addEventListener('DOMContentLoaded', () => {
-            updateCoins();
-            likeAttempts = {1: 0, 2: 0}; // شبیه‌سازی پست‌ها
-        });
-
-        // مشاهده پست (در تب جدید)
-        function viewPost(postId) {
-            window.open(`https://warpcast.com/fredrickadler/0x0a6d75f4`, '_blank');
+        if (!popup.contains(e.target) {
+          popup.classList.remove('show');
         }
-
-        // تأیید لایک (با هشدار)
-        function verifyLike(postId) {
-            const hasLiked = confirm(`Did you LIKE post #${postId} on Warpcast?`);
-            
-            if (!hasLiked) {
-                likeAttempts[postId]++;
-                showAlert(`⚠️ Please LIKE the post first! (Attempt ${likeAttempts[postId]}/3)`);
-                
-                if (likeAttempts[postId] >= 3) {
-                    coins = Math.max(0, coins - 1); // جریمه ۱ سکه
-                    updateCoins();
-                    showAlert("❌ 1 COIN deducted for skipping LIKE!");
-                    likeAttempts[postId] = 0;
-                }
-                return;
-            }
-            
-            // اگر لایک کرده باشد
-            const reward = postId === 2 ? 2 : 1; // پست دوم ۲ سکه می‌دهد
-            coins += reward;
-            updateCoins();
-            showAlert(`✅ +${reward} COIN received!`);
-        }
-
-        // نمایش هشدار
-        function showAlert(message) {
-            const alert = document.getElementById('alert');
-            alert.textContent = message;
-            alert.style.display = 'block';
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 3000);
-        }
-
-        // به‌روزرسانی موجودی
-        function updateCoins() {
-            document.getElementById('coin-balance').textContent = coins;
-        }
-    </script>
+      });
+    });
+  </script>
 </body>
 </html>
