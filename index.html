@@ -1,331 +1,279 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فارکستر کوین | افزایش تعامل با لایک و فالو</title>
+    <title>FarKaster Coin | Like-to-Earn</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #6a0dad; /* بنفش فارکستر */
-            --secondary: #000000; /* مشکی */
-            --accent: #9c27b0; /* بنفش روشن */
-            --text: #f0f0f0;
+            --dark-black: rgba(10, 10, 10, 0.9); /* مشکی نوک مدادی */
+            --far-purple: #4b0082; /* بنفش تیره فارکستر */
+            --far-light: #7b2cbf; /* بنفش روشن */
+            --text-white: #ffffff;
+            --text-gray: #b0b0b0;
         }
-        
-        * {
+
+        body {
+            background-color: #000;
+            color: var(--text-white);
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: var(--secondary);
-            color: var(--text);
             overflow-x: hidden;
         }
-        
-        /* پارالاکس اسکرول */
-        .parallax-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            z-index: -1;
-            opacity: 0.8;
-        }
-        
-        /* هدر */
-        header {
+
+        /* نوار بالایی */
+        .top-bar {
+            background: var(--dark-black);
             padding: 1rem;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--primary);
+            border-bottom: 1px solid var(--far-purple);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
         }
-        
+
         .logo {
-            font-size: 1.5rem;
             font-weight: bold;
-            color: var(--accent);
+            color: var(--far-light);
+            font-size: 1.2rem;
         }
-        
+
         .wallet {
-            background: rgba(106, 13, 173, 0.3);
+            background: rgba(75, 0, 130, 0.3);
             padding: 0.5rem 1rem;
             border-radius: 20px;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: 0.9rem;
         }
-        
+
         /* محتوای اصلی */
-        .container {
-            max-width: 800px;
+        .feed {
+            max-width: 600px;
             margin: 2rem auto;
-            padding: 1rem;
+            padding: 0 1rem;
         }
-        
+
         .post {
-            background: rgba(30, 30, 30, 0.8);
-            border-radius: 10px;
-            padding: 1rem;
+            background: var(--dark-black);
+            border-radius: 12px;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s;
+            overflow: hidden;
+            border: 1px solid rgba(75, 0, 130, 0.5);
+            position: relative;
         }
-        
-        .post:hover {
-            transform: translateY(-5px);
-        }
-        
-        .post-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .post-user {
-            font-weight: bold;
-            color: var(--accent);
-        }
-        
-        .post-content {
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-        
+
         .post-image {
             width: 100%;
-            border-radius: 8px;
-            margin-bottom: 1rem;
+            height: auto;
+            display: block;
         }
-        
-        .post-actions {
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 0.5rem;
+
+        .post-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            padding: 1rem;
+            color: var(--text-white);
         }
-        
-        .action-btn {
-            background: none;
-            border: none;
-            color: var(--text);
-            font-size: 1rem;
-            cursor: pointer;
+
+        .post-user {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
-            gap: 0.3rem;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            transition: all 0.3s;
+            gap: 0.5rem;
         }
-        
-        .action-btn:hover {
-            background: rgba(106, 13, 173, 0.3);
-            color: var(--accent);
+
+        .post-text {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-gray);
         }
-        
-        .promote-btn {
-            background: var(--primary);
+
+        .post-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem;
+            background: rgba(75, 0, 130, 0.2);
+        }
+
+        .action-btn {
+            background: var(--far-purple);
             color: white;
             border: none;
             padding: 0.5rem 1rem;
-            border-radius: 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            margin-top: 0.5rem;
-            width: 100%;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        
-        .promote-btn:hover {
-            background: var(--accent);
+
+        .action-btn:hover {
+            background: var(--far-light);
             transform: scale(1.02);
         }
-        
-        /* فوتر */
-        footer {
-            text-align: center;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.7);
-            margin-top: 2rem;
-            border-top: 1px solid var(--primary);
+
+        .action-btn.secondary {
+            background: transparent;
+            border: 1px solid var(--far-purple);
         }
-        
-        /* انیمیشن‌ها */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .floating-coin {
+
+        /* هشدار */
+        .alert {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: var(--primary);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(106, 13, 173, 0.5);
-            cursor: pointer;
-            animation: float 3s ease-in-out infinite;
-            z-index: 10;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 50, 50, 0.9);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            z-index: 1000;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- پس‌زمینه پارالاکس -->
-    <div class="parallax-bg"></div>
-    
-    <!-- هدر -->
-    <header>
-        <div class="logo">فارکستر کوین</div>
+    <!-- نوار بالایی -->
+    <div class="top-bar">
+        <div class="logo">FarKaster Coin</div>
         <div class="wallet">
             <i class="fas fa-coins"></i>
-            <span id="coin-balance">0</span> سکه
-        </div>
-    </header>
-    
-    <!-- محتوای اصلی -->
-    <div class="container">
-        <!-- پست نمونه ۱ -->
-        <div class="post">
-            <div class="post-header">
-                <img src="https://via.placeholder.com/40" alt="User" style="width: 40px; height: 40px; border-radius: 50%;">
-                <div class="post-user">کاربر فارکستر</div>
-            </div>
-            <div class="post-content">
-                این یک پست نمونه در فارکستر کوین است! با لایک و کامنت سکه بگیرید و پست خود را پروموت کنید.
-            </div>
-            <img src="https://via.placeholder.com/600x300/6a0dad/ffffff?text=FarKaster+Coin" class="post-image" alt="Post Image">
-            <div class="post-actions">
-                <button class="action-btn" onclick="likePost(1)">
-                    <i class="far fa-heart"></i> لایک (۱ سکه)
-                </button>
-                <button class="action-btn" onclick="commentPost(1)">
-                    <i class="far fa-comment"></i> کامنت (۲ سکه)
-                </button>
-                <button class="action-btn" onclick="followUser(1)">
-                    <i class="far fa-user"></i> فالو (۲ سکه)
-                </button>
-            </div>
-            <button class="promote-btn" onclick="promotePost(1)">
-                <i class="fas fa-rocket"></i> پروموت این پست (۱۰ سکه)
-            </button>
-        </div>
-        
-        <!-- پست نمونه ۲ -->
-        <div class="post">
-            <div class="post-header">
-                <img src="https://via.placeholder.com/40" alt="User" style="width: 40px; height: 40px; border-radius: 50%;">
-                <div class="post-user">کاربر فعال</div>
-            </div>
-            <div class="post-content">
-                من با این سیستم ۱۰۰ سکه جمع کردم و پست‌هایم را پروموت می‌کنم! شما هم امتحان کنید.
-            </div>
-            <div class="post-actions">
-                <button class="action-btn" onclick="likePost(2)">
-                    <i class="far fa-heart"></i> لایک (۱ سکه)
-                </button>
-                <button class="action-btn" onclick="commentPost(2)">
-                    <i class="far fa-comment"></i> کامنت (۲ سکه)
-                </button>
-                <button class="action-btn" onclick="followUser(2)">
-                    <i class="far fa-user"></i> فالو (۲ سکه)
-                </button>
-            </div>
-            <button class="promote-btn" onclick="promotePost(2)">
-                <i class="fas fa-rocket"></i> پروموت این پست (۱۰ سکه)
-            </button>
+            <span id="coin-balance">0</span> COIN
         </div>
     </div>
-    
-    <!-- دکمه شناور خرید سکه -->
-    <div class="floating-coin" onclick="buyCoins()">
-        <i class="fas fa-shopping-cart"></i>
+
+    <!-- هشدار -->
+    <div class="alert" id="alert">Please LIKE the post first!</div>
+
+    <!-- فید پست‌ها -->
+    <div class="feed">
+        <!-- پست نمونه (مثل Warpcast) -->
+        <div class="post" id="post-1">
+            <img src="https://i.imgur.com/XYZ1234.jpg" class="post-image" alt="NFT Post">
+            <div class="post-overlay">
+                <div class="post-user">
+                    <i class="fas fa-user"></i>
+                    @fredrickadler
+                </div>
+                <div class="post-text">
+                    Check out my new FarKaster NFT collection! Like & Earn coins.
+                </div>
+                <div class="post-stats">
+                    <span><i class="far fa-heart"></i> 142/500</span>
+                    <span><i class="fas fa-coins"></i> +1 COIN per LIKE</span>
+                </div>
+            </div>
+            <div class="post-actions">
+                <button class="action-btn secondary" onclick="viewPost(1)">
+                    <i class="fas fa-external-link-alt"></i> View
+                </button>
+                <button class="action-btn" onclick="verifyLike(1)">
+                    <i class="fas fa-check-circle"></i> Verify Like
+                </button>
+            </div>
+        </div>
+
+        <!-- پست دوم -->
+        <div class="post" id="post-2">
+            <img src="https://i.imgur.com/ABCD5678.jpg" class="post-image" alt="NFT Post 2">
+            <div class="post-overlay">
+                <div class="post-user">
+                    <i class="fas fa-user"></i>
+                    @cryptogod
+                </div>
+                <div class="post-text">
+                    Daily reward: Like this post and get 2 COINs!
+                </div>
+                <div class="post-stats">
+                    <span><i class="far fa-heart"></i> 89/200</span>
+                    <span><i class="fas fa-coins"></i> +2 COINs</span>
+                </div>
+            </div>
+            <div class="post-actions">
+                <button class="action-btn secondary" onclick="viewPost(2)">
+                    <i class="fas fa-external-link-alt"></i> View
+                </button>
+                <button class="action-btn" onclick="verifyLike(2)">
+                    <i class="fas fa-check-circle"></i> Verify Like
+                </button>
+            </div>
+        </div>
     </div>
-    
-    <!-- فوتر -->
-    <footer>
-        <p>ساخته شده با ❤️ برای فارکستر | اتصال با Warplet</p>
-    </footer>
-    
-    <!-- اسکریپت‌ها -->
+
     <script>
-        // متغیرهای سکه و کاربر
-        let coins = 0;
+        // متغیرهای سیستم
+        let coins = 50;
+        let likeAttempts = {};
         
-        // بارگذاری موجودی سکه از Warplet (شبیه‌سازی)
-        function loadCoins() {
-            // در حالت واقعی، از API فارکستر دریافت می‌شود
-            coins = 50; // مقدار نمونه
-            document.getElementById('coin-balance').textContent = coins;
-        }
-        
-        // لایک پست
-        function likePost(postId) {
-            coins += 1;
+        // بارگذاری اولیه
+        document.addEventListener('DOMContentLoaded', () => {
             updateCoins();
-            alert(`پست ${postId} لایک شد! ۱ سکه دریافت کردید.`);
+            likeAttempts = {1: 0, 2: 0}; // شبیه‌سازی پست‌ها
+        });
+
+        // مشاهده پست (در تب جدید)
+        function viewPost(postId) {
+            window.open(`https://warpcast.com/fredrickadler/0x0a6d75f4`, '_blank');
         }
-        
-        // کامنت پست
-        function commentPost(postId) {
-            coins += 2;
-            updateCoins();
-            alert(`پست ${postId} کامنت شد! ۲ سکه دریافت کردید.`);
-        }
-        
-        // فالو کاربر
-        function followUser(userId) {
-            coins += 2;
-            updateCoins();
-            alert(`کاربر ${userId} فالو شد! ۲ سکه دریافت کردید.`);
-        }
-        
-        // پروموت پست
-        function promotePost(postId) {
-            if (coins >= 10) {
-                coins -= 10;
-                updateCoins();
-                alert(`پست ${postId} با ۱۰ سکه پروموت شد!`);
-            } else {
-                alert("سکه کافی ندارید!");
+
+        // تأیید لایک (با هشدار)
+        function verifyLike(postId) {
+            const hasLiked = confirm(`Did you LIKE post #${postId} on Warpcast?`);
+            
+            if (!hasLiked) {
+                likeAttempts[postId]++;
+                showAlert(`⚠️ Please LIKE the post first! (Attempt ${likeAttempts[postId]}/3)`);
+                
+                if (likeAttempts[postId] >= 3) {
+                    coins = Math.max(0, coins - 1); // جریمه ۱ سکه
+                    updateCoins();
+                    showAlert("❌ 1 COIN deducted for skipping LIKE!");
+                    likeAttempts[postId] = 0;
+                }
+                return;
             }
+            
+            // اگر لایک کرده باشد
+            const reward = postId === 2 ? 2 : 1; // پست دوم ۲ سکه می‌دهد
+            coins += reward;
+            updateCoins();
+            showAlert(`✅ +${reward} COIN received!`);
         }
-        
-        // خرید سکه
-        function buyCoins() {
-            const amount = prompt("چه تعداد سکه می‌خواهید خریداری کنید؟ (هر ۱۰۰۰ سکه = ۱ دلار)");
-            if (amount && !isNaN(amount)) {
-                coins += parseInt(amount);
-                updateCoins();
-                alert(`${amount} سکه خریداری شد!`);
-            }
+
+        // نمایش هشدار
+        function showAlert(message) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
         }
-        
-        // به‌روزرسانی نمایش سکه
+
+        // به‌روزرسانی موجودی
         function updateCoins() {
             document.getElementById('coin-balance').textContent = coins;
         }
-        
-        // بارگذاری اولیه
-        window.onload = loadCoins;
     </script>
 </body>
 </html>
