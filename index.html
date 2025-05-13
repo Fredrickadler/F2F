@@ -1,342 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FarKaster Like-to-Earn</title>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
     :root {
-      --dark-black: rgba(15, 15, 15, 0.95);
-      --far-purple: #4b0082;
-      --far-light: #7b2cbf;
-      --text-white: #ffffff;
-      --text-gray: #b0b0b0;
+      --primary: #8A5AFF;
+      --primary-dark: #6E3AFF;
+      --gray-900: #0F0F0F;
+      --gray-800: #1A1A1A;
+      --gray-700: #2E2E2E;
+      --gray-400: #A0A0A0;
+      --gray-200: #E5E5E5;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
+    body { background-color: var(--gray-900); color: white; min-height: 100vh; overflow-x: hidden; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    header { display: flex; justify-content: flex-end; padding: 24px 0; }
+    .wallet-btn {
+      background: var(--primary); color: white; border: none; padding: 12px 24px;
+      border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 15px;
+      transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 20px rgba(138, 90, 255, 0.3);
     }
-
-    body {
-      background-color: #000;
-      color: var(--text-white);
-      overflow-x: hidden;
-      position: relative;
+    .wallet-btn:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 6px 25px rgba(138, 90, 255, 0.4); }
+    .wallet-btn i { font-size: 16px; }
+    .wallet-address {
+      background: var(--gray-800); padding: 10px 20px; border-radius: 12px;
+      font-size: 14px; font-weight: 500; display: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); cursor: pointer;
     }
-
-    /* انیمیشن ستاره‌ها */
-    .stars {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
+    .main-content {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 40px 0 80px;
     }
-
-    .star {
-      position: absolute;
-      background: rgba(138, 90, 255, 0.7);
-      border-radius: 50%;
-      animation: twinkle 3s infinite ease-in-out;
+    .post-card {
+      width: 100%; max-width: 420px; margin-bottom: 40px; position: relative;
+      overflow: hidden; border-radius: 16px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(138, 90, 255, 0.3);
     }
-
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
-    }
-
-    /* محتوای اصلی */
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    /* پست‌ها */
-    .post {
-      background: var(--dark-black);
-      border-radius: 12px;
-      margin-bottom: 20px;
-      overflow: hidden;
-      border: 1px solid rgba(75, 0, 130, 0.5);
-      position: relative;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    }
-
     .post-image {
-      width: 100%;
-      display: block;
+      width: 100%; aspect-ratio: 1/1; object-fit: cover;
+      display: block; transition: transform 0.5s ease;
     }
-
+    .post-card:hover .post-image { transform: scale(1.03); }
     .post-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      position: absolute; bottom: 0; left: 0; right: 0;
       background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-      padding: 15px;
+      padding: 24px; color: white;
     }
-
-    .post-user {
-      font-weight: bold;
-      margin-bottom: 5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .post-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    .post-description {
+      font-size: 15px; color: var(--gray-200); opacity: 0.9; line-height: 1.5;
     }
-
-    .post-text {
-      font-size: 14px;
-      color: var(--text-gray);
-      margin-bottom: 10px;
-    }
-
     .post-stats {
-      display: flex;
-      gap: 15px;
-      font-size: 12px;
-      color: var(--text-gray);
+      display: flex; justify-content: space-between;
+      color: var(--gray-400); font-size: 14px; margin-top: 12px;
     }
-
     .post-actions {
-      display: flex;
-      padding: 12px;
-      background: rgba(75, 0, 130, 0.2);
-      gap: 10px;
+      display: flex; justify-content: space-between;
+      padding: 16px; background: rgba(138, 90, 255, 0.1);
     }
-
     .action-btn {
-      flex: 1;
-      background: var(--far-purple);
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
+      background: var(--primary); color: white; border: none;
+      padding: 12px 24px; border-radius: 12px; cursor: pointer;
+      font-weight: 600; font-size: 15px; transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(138, 90, 255, 0.3);
+      display: flex; align-items: center; gap: 8px;
     }
-
     .action-btn:hover {
-      background: var(--far-light);
-      transform: translateY(-2px);
+      background: var(--primary-dark); transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(138, 90, 255, 0.5);
     }
-
-    /* دکمه اتصال ولت */
-    .connect-wallet {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--far-purple);
-      color: white;
-      border: none;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 4px 15px rgba(75, 0, 130, 0.5);
-      z-index: 100;
-      transition: all 0.3s;
+    .action-btn.secondary {
+      background: transparent; border: 1px solid var(--primary);
     }
-
-    .connect-wallet:hover {
-      background: var(--far-light);
-      transform: scale(1.1);
+    .particles {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: -1;
     }
-
-    /* پاپ‌آپ ولت */
-    .wallet-popup {
-      position: fixed;
-      bottom: 80px;
-      right: 20px;
-      background: var(--dark-black);
-      border: 1px solid var(--far-purple);
-      border-radius: 12px;
-      padding: 15px;
-      width: 250px;
-      display: none;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.7);
-      z-index: 100;
+    .particle {
+      position: absolute; width: 2px; height: 2px;
+      background: rgba(138, 90, 255, 0.5); border-radius: 50%;
+      animation: float 15s infinite linear;
     }
-
-    .wallet-popup.show {
-      display: block;
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
     }
-
-    .wallet-option {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: background 0.3s;
-    }
-
-    .wallet-option:hover {
-      background: rgba(75, 0, 130, 0.3);
-    }
-
-    .wallet-icon {
-      font-size: 20px;
-    }
-
-    /* اسپینر */
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: var(--far-light);
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    @media (max-width: 768px) {
+      .main-content { padding: 20px 0 60px; }
+      .post-card { max-width: 100%; }
+      .post-title { font-size: 20px; }
+      .post-description { font-size: 14px; }
     }
   </style>
 </head>
 <body>
-  <!-- انیمیشن ستاره‌ها -->
-  <div class="stars" id="stars"></div>
-
-  <!-- محتوای اصلی -->
+  <div class="particles" id="particles"></div>
   <div class="container">
-    <!-- پست نمونه ۱ -->
-    <div class="post">
-      <img src="https://i.imgur.com/muoYEIu.jpeg" class="post-image" alt="NFT Post">
-      <div class="post-overlay">
-        <div class="post-user">
-          <i class="fas fa-user"></i>
-          @faruser1
-        </div>
-        <div class="post-text">
-          Like this post to earn rewards! Click verify after liking.
-        </div>
-        <div class="post-stats">
-          <span><i class="far fa-heart"></i> 142/500</span>
-          <span><i class="fas fa-bolt"></i> 1 REWARD</span>
-        </div>
-      </div>
-      <div class="post-actions">
-        <button class="action-btn" onclick="viewPost(1)">
-          <i class="fas fa-external-link-alt"></i> View
-        </button>
-        <button class="action-btn" onclick="verifyLike(1)">
-          <i class="fas fa-check-circle"></i> Verify
-        </button>
-      </div>
-    </div>
+    <header>
+      <button class="wallet-btn" id="connectWallet">
+        <i class="fas fa-wallet"></i> Connect Wallet
+      </button>
+      <div class="wallet-address" id="walletAddress"></div>
+    </header>
 
-    <!-- پست نمونه ۲ -->
-    <div class="post">
-      <img src="https://i.imgur.com/ABCD5678.jpg" class="post-image" alt="NFT Post 2">
-      <div class="post-overlay">
-        <div class="post-user">
-          <i class="fas fa-user"></i>
-          @faruser2
+    <main class="main-content">
+      <div class="post-card">
+        <img src="https://i.imgur.com/muoYEIu.jpeg" alt="FarKaster Post" class="post-image">
+        <div class="post-overlay">
+          <h1 class="post-title">@faruser1</h1>
+          <p class="post-description">
+            Like this post to earn 1 COIN. Verify after liking.
+          </p>
+          <div class="post-stats">
+            <span><i class="far fa-heart"></i> 142/500 Likes</span>
+            <span><i class="fas fa-coins"></i> 1 COIN</span>
+          </div>
         </div>
-        <div class="post-text">
-          Double rewards today! Like and get 2x points.
-        </div>
-        <div class="post-stats">
-          <span><i class="far fa-heart"></i> 89/200</span>
-          <span><i class="fas fa-bolt"></i> 2 REWARDS</span>
+        <div class="post-actions">
+          <button class="action-btn secondary" onclick="viewPost(1)">
+            <i class="fas fa-external-link-alt"></i> View
+          </button>
+          <button class="action-btn" onclick="verifyLike(1)">
+            <i class="fas fa-check-circle"></i> Verify
+          </button>
         </div>
       </div>
-      <div class="post-actions">
-        <button class="action-btn" onclick="viewPost(2)">
-          <i class="fas fa-external-link-alt"></i> View
-        </button>
-        <button class="action-btn" onclick="verifyLike(2)">
-          <i class="fas fa-check-circle"></i> Verify
-        </button>
+
+      <div class="post-card">
+        <img src="https://i.imgur.com/ABCD5678.jpg" alt="FarKaster Post 2" class="post-image">
+        <div class="post-overlay">
+          <h1 class="post-title">@faruser2</h1>
+          <p class="post-description">
+            Double rewards today! Like and get 2 COINs.
+          </p>
+          <div class="post-stats">
+            <span><i class="far fa-heart"></i> 89/200 Likes</span>
+            <span><i class="fas fa-coins"></i> 2 COINs</span>
+          </div>
+        </div>
+        <div class="post-actions">
+          <button class="action-btn secondary" onclick="viewPost(2)">
+            <i class="fas fa-external-link-alt"></i> View
+          </button>
+          <button class="action-btn" onclick="verifyLike(2)">
+            <i class="fas fa-check-circle"></i> Verify
+          </button>
+        </div>
       </div>
-    </div>
-  </div>
-
-  <!-- دکمه اتصال ولت -->
-  <button class="connect-wallet" onclick="toggleWalletPopup()">
-    <i class="fas fa-wallet"></i>
-  </button>
-
-  <!-- پاپ‌آپ ولت -->
-  <div class="wallet-popup" id="walletPopup">
-    <div class="wallet-option" onclick="connectWallet('metamask')">
-      <i class="fab fa-ethereum wallet-icon"></i>
-      <span>MetaMask</span>
-    </div>
-    <div class="wallet-option" onclick="connectWallet('walletconnect')">
-      <i class="fas fa-link wallet-icon"></i>
-      <span>WalletConnect</span>
-    </div>
-    <div class="wallet-option" onclick="connectWallet('coinbase')">
-      <i class="fab fa-bitcoin wallet-icon"></i>
-      <span>Coinbase Wallet</span>
-    </div>
+    </main>
   </div>
 
   <script>
-    // ایجاد ستاره‌ها
-    function createStars() {
-      const starsContainer = document.getElementById('stars');
-      for (let i = 0; i < 100; i++) {
-        const star = document.createElement('div');
-        star.classList.add('star');
-        star.style.left = `${Math.random() * 100}%`;
-        star.style.top = `${Math.random() * 100}%`;
-        star.style.width = `${Math.random() * 3 + 1}px`;
-        star.style.height = star.style.width;
-        star.style.animationDelay = `${Math.random() * 3}s`;
-        starsContainer.appendChild(star);
+    let provider, signer, address;
+
+    const connectWallet = document.getElementById('connectWallet');
+    const walletAddress = document.getElementById('walletAddress');
+
+    connectWallet.addEventListener('click', async () => {
+      try {
+        if (window.ethereum) {
+          provider = new ethers.BrowserProvider(window.ethereum);
+          await provider.send("eth_requestAccounts", []);
+          signer = await provider.getSigner();
+          address = await signer.getAddress();
+
+          connectWallet.style.display = 'none';
+          walletAddress.style.display = 'block';
+          walletAddress.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+        } else {
+          alert('Please install MetaMask or another Ethereum wallet.');
+        }
+      } catch (error) {
+        console.error("Wallet connection failed:", error);
       }
-    }
+    });
 
-    // نمایش/پنهان کردن پاپ‌آپ ولت
-    function toggleWalletPopup() {
-      document.getElementById('walletPopup').classList.toggle('show');
-    }
-
-    // اتصال ولت
-    function connectWallet(walletType) {
-      const popup = document.getElementById('walletPopup');
-      const connectBtn = document.querySelector('.connect-wallet');
-      
-      // شبیه‌سازی اتصال
-      connectBtn.innerHTML = '<div class="spinner"></div>';
-      popup.classList.remove('show');
-      
-      setTimeout(() => {
-        connectBtn.innerHTML = '<i class="fas fa-check"></i>';
-        setTimeout(() => {
-          connectBtn.innerHTML = '<i class="fas fa-wallet"></i>';
-        }, 2000);
-      }, 1500);
-      
-      alert(`Connecting ${walletType} wallet...`);
-    }
-
-    // مشاهده پست
     function viewPost(postId) {
       window.open(`https://warpcast.com/faruser${postId}/0x0a6d75f4`, '_blank');
     }
 
-    // تأیید لایک
     function verifyLike(postId) {
       const hasLiked = confirm(`Did you LIKE post #${postId} on Warpcast?`);
       
@@ -345,24 +200,28 @@
         return;
       }
       
-      // شبیه‌سازی دریافت پاداش
       const reward = postId === 2 ? 2 : 1;
-      alert(`✅ Success! You earned ${reward} reward(s)`);
+      alert(`✅ Success! You earned ${reward} COIN(s)`);
     }
 
-    // بارگذاری اولیه
-    window.addEventListener('DOMContentLoaded', () => {
-      createStars();
-      
-      // بستن پاپ‌آپ با کلیک خارج از آن
-      document.addEventListener('click', (e) => {
-        const popup = document.getElementById('walletPopup');
-        const connectBtn = document.querySelector('.connect-wallet');
-        
-        if (!popup.contains(e.target) {
-          popup.classList.remove('show');
-        }
-      });
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      document.getElementById('particles').appendChild(particle);
+      particle.style.left = `${Math.random() * window.innerWidth}px`;
+      particle.style.top = `${Math.random() * window.innerHeight}px`;
+      const size = Math.random() * 3 + 2;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+    }
+
+    setInterval(createParticle, 100);
+
+    walletAddress.addEventListener('click', () => {
+      connectWallet.style.display = 'inline-block';
+      walletAddress.style.display = 'none';
+      signer = null;
+      address = null;
     });
   </script>
 </body>
