@@ -944,6 +944,7 @@
     // اتصال کیف پول
     let provider, signer, address;
     let currentOrder = null;
+    let rulesAccepted = false;
 
     function setupWalletConnection(connectBtnId, addressId) {
       const connectBtn = document.getElementById(connectBtnId);
@@ -1083,4 +1084,67 @@
       setTimeout(() => {
         showPage('profile-page');
         submitBtn.textContent = 'Confirm Order';
-        submit
+        submitBtn.classList.remove('success');
+      }, 2000);
+    }
+
+    // قوانین اولیه
+    function toggleRule(ruleNumber) {
+      const checkbox = document.getElementById(`rule${ruleNumber}-checkbox`);
+      checkbox.classList.toggle('checked');
+      
+      // بررسی اینکه آیا همه قوانین پذیرفته شده‌اند
+      const allRulesAccepted = 
+        document.getElementById('rule1-checkbox').classList.contains('checked') &&
+        document.getElementById('rule2-checkbox').classList.contains('checked') &&
+        document.getElementById('rule3-checkbox').classList.contains('checked');
+      
+      if (allRulesAccepted) {
+        document.getElementById('tutorial-submit-btn').classList.add('active');
+        rulesAccepted = true;
+      } else {
+        document.getElementById('tutorial-submit-btn').classList.remove('active');
+        rulesAccepted = false;
+      }
+    }
+
+    function closeTutorial() {
+      if (rulesAccepted) {
+        document.getElementById('tutorial-overlay').style.display = 'none';
+        // ذخیره در localStorage که کاربر قبلاً قوانین را پذیرفته است
+        localStorage.setItem('tutorialAccepted', 'true');
+      }
+    }
+
+    // بارگذاری اولیه
+    window.addEventListener('DOMContentLoaded', () => {
+      createStars();
+      
+      setupWalletConnection('connectWallet', 'walletAddress');
+      setupWalletConnection('connectWallet2', 'walletAddress2');
+      setupWalletConnection('connectWallet3', 'walletAddress3');
+      setupWalletConnection('connectWallet4', 'walletAddress4');
+      setupWalletConnection('connectWallet5', 'walletAddress5');
+      
+      // شبیه‌سازی تغییر نوع دکمه عمل
+      setTimeout(() => {
+        const actionBtn = document.querySelector('.action-buttons .action-btn.primary');
+        actionBtn.innerHTML = '<i class="fas fa-user-plus"></i><span>FOLLOW</span>';
+        actionBtn.onclick = function() {
+          const confirmed = confirm('Did you follow this user on Warpcast?');
+          if (confirmed) {
+            alert('+2 COINS earned!');
+          } else {
+            alert('Please follow the user first!');
+          }
+        };
+      }, 3000);
+      
+      // نمایش صفحه قوانین اگر اولین بار است که وارد می‌شود
+      if (!localStorage.getItem('tutorialAccepted')) {
+        document.getElementById('tutorial-overlay').style.display = 'flex';
+      }
+    });
+  </script>
+</body>
+</html>
