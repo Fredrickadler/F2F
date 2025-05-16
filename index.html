@@ -8,7 +8,7 @@
   <!-- Farcaster Meta -->
   <meta name="fc:frame" content='{
     "version":"next",
-    "imageUrl":"https://i.imgur.com/dDpcwCa.jpeg",
+    "imageUrl":"https://i.imgur.com/dDpcwCa_d.webp?maxwidth=1520&fidelity=grand",
     "button":{
       "title":"Liky Mini App",
       "action":{
@@ -26,7 +26,6 @@
   
   <!-- Other Dependencies -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -60,11 +59,9 @@
       flex-direction: column;
       overflow: hidden;
       position: relative;
-      opacity: 0;
-      transition: opacity 0.3s;
+      opacity: 1;
     }
 
-    /* Loading Overlay */
     .loading-overlay {
       position: fixed;
       top: 0;
@@ -91,7 +88,6 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Header Styles */
     .header {
       padding: 15px;
       display: flex;
@@ -123,13 +119,20 @@
     }
 
     .wallet-address {
-      background: var(--gray-800);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       padding: 12px 24px;
       border-radius: 12px;
       font-size: 16px;
-      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
       display: none;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      font-weight: 500;
+    }
+
+    .wallet-address:hover {
+      background: rgba(255, 255, 255, 0.2);
     }
 
     .back-btn {
@@ -160,7 +163,6 @@
       background: var(--primary-dark);
     }
 
-    /* Star Animation */
     .stars {
       position: fixed;
       top: 0;
@@ -176,6 +178,7 @@
       background: rgba(138, 90, 255, 0.7);
       border-radius: 50%;
       animation: twinkle 3s infinite ease-in-out, float 50s linear infinite;
+      opacity: 0;
     }
 
     @keyframes twinkle {
@@ -188,7 +191,6 @@
       100% { transform: translate(100px, -100vh); }
     }
 
-    /* Page Styles */
     .page {
       flex: 1;
       display: none;
@@ -206,7 +208,6 @@
       to { opacity: 1; }
     }
 
-    /* Post Container */
     .post-container {
       flex: 1;
       display: flex;
@@ -259,7 +260,6 @@
       line-height: 1.5;
     }
 
-    /* Progress Bar */
     .progress-container {
       width: 100%;
       max-width: 500px;
@@ -290,7 +290,6 @@
       transition: width 0.5s ease;
     }
 
-    /* Action Buttons */
     .action-buttons {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -328,7 +327,6 @@
       background: var(--primary-dark);
     }
 
-    /* Tab Bar */
     .tab-bar {
       display: flex;
       background: var(--gray-800);
@@ -363,7 +361,6 @@
       background: rgba(138, 90, 255, 0.1);
     }
 
-    /* Leaderboard Page */
     .leaderboard-item {
       display: flex;
       align-items: center;
@@ -418,7 +415,6 @@
       font-size: 14px;
     }
 
-    /* Profile Page */
     .profile-content {
       max-width: 500px;
       width: 100%;
@@ -487,7 +483,6 @@
       width: 100%;
     }
 
-    /* Order Page */
     .packages-container {
       display: grid;
       grid-template-columns: 1fr;
@@ -554,7 +549,6 @@
       background: var(--primary-dark);
     }
 
-    /* Order Form */
     .order-form-container {
       max-width: 500px;
       width: 100%;
@@ -627,10 +621,10 @@
       <div class="add-order-btn" onclick="showPage('order-page')">
         <i class="fas fa-plus"></i>
       </div>
-      <button class="wallet-btn" id="connectWallet">
+      <button class="wallet-btn" onclick="toggleWallet()">
         <i class="fas fa-wallet"></i> Connect Wallet
       </button>
-      <div class="wallet-address" id="walletAddress"></div>
+      <div class="wallet-address" id="walletAddress" onclick="toggleWallet()"></div>
     </div>
     
     <div class="post-container">
@@ -675,10 +669,10 @@
       <div class="add-order-btn" onclick="showPage('order-page')">
         <i class="fas fa-plus"></i>
       </div>
-      <button class="wallet-btn" id="connectWallet2">
+      <button class="wallet-btn" onclick="toggleWallet()">
         <i class="fas fa-wallet"></i> Connect Wallet
       </button>
-      <div class="wallet-address" id="walletAddress2"></div>
+      <div class="wallet-address" id="walletAddress2" onclick="toggleWallet()"></div>
     </div>
     
     <div class="post-container">
@@ -724,10 +718,10 @@
       <div class="add-order-btn" onclick="showPage('order-page')">
         <i class="fas fa-plus"></i>
       </div>
-      <button class="wallet-btn" id="connectWallet3">
+      <button class="wallet-btn" onclick="toggleWallet()">
         <i class="fas fa-wallet"></i> Connect Wallet
       </button>
-      <div class="wallet-address" id="walletAddress3"></div>
+      <div class="wallet-address" id="walletAddress3" onclick="toggleWallet()"></div>
     </div>
     
     <div class="profile-content">
@@ -775,10 +769,10 @@
       <button class="back-btn" onclick="goBack()">
         <i class="fas fa-arrow-left"></i>
       </button>
-      <button class="wallet-btn" id="connectWallet4">
+      <button class="wallet-btn" onclick="toggleWallet()">
         <i class="fas fa-wallet"></i> Connect Wallet
       </button>
-      <div class="wallet-address" id="walletAddress4"></div>
+      <div class="wallet-address" id="walletAddress4" onclick="toggleWallet()"></div>
     </div>
     
     <div class="packages-container">
@@ -829,10 +823,10 @@
       <button class="back-btn" onclick="showPage('order-page')">
         <i class="fas fa-arrow-left"></i>
       </button>
-      <button class="wallet-btn" id="connectWallet5">
+      <button class="wallet-btn" onclick="toggleWallet()">
         <i class="fas fa-wallet"></i> Connect Wallet
       </button>
-      <div class="wallet-address" id="walletAddress5"></div>
+      <div class="wallet-address" id="walletAddress5" onclick="toggleWallet()"></div>
     </div>
     
     <div class="order-form-container">
@@ -883,20 +877,18 @@
   <script type="module">
     import sdk from 'https://esm.sh/@farcaster/frame-sdk';
 
-    let provider, signer, address;
+    let provider, address;
     let currentPage = 'home-page';
     let previousPage = 'home-page';
     let currentOrder = null;
+    let isConnected = false;
 
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         await sdk.actions.ready();
-        const context = await sdk.context;
-        console.log("Farcaster Ready:", context);
-        
-        initializeApp();
         document.body.style.opacity = 1;
         document.getElementById('loading').style.display = 'none';
+        initializeApp();
       } catch (error) {
         console.error("Initialization Error:", error);
         document.getElementById('loading').style.display = 'none';
@@ -906,9 +898,6 @@
 
     function initializeApp() {
       createStars();
-      setupWalletConnections();
-      
-      // Expose functions to global scope
       window.showPage = showPage;
       window.goBack = goBack;
       window.skipPost = skipPost;
@@ -916,50 +905,72 @@
       window.likePost = likePost;
       window.startOrder = startOrder;
       window.submitOrder = submitOrder;
+      window.toggleWallet = toggleWallet;
+    }
+
+    async function toggleWallet() {
+      if (isConnected) {
+        disconnectWallet();
+      } else {
+        await connectWallet();
+      }
+    }
+
+    async function connectWallet() {
+      try {
+        if (!sdk.wallet?.ethProvider) {
+          alert('Please open in Warpcast to connect wallet');
+          return;
+        }
+
+        provider = sdk.wallet.ethProvider;
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        address = accounts[0];
+        isConnected = true;
+
+        document.querySelectorAll('.wallet-address').forEach(el => {
+          el.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+          el.style.display = 'block';
+        });
+
+        document.querySelectorAll('.wallet-btn').forEach(btn => {
+          btn.style.display = 'none';
+        });
+
+      } catch (error) {
+        console.error("Wallet connection failed:", error);
+      }
+    }
+
+    function disconnectWallet() {
+      isConnected = false;
+      address = null;
+      document.querySelectorAll('.wallet-address').forEach(el => {
+        el.style.display = 'none';
+      });
+      document.querySelectorAll('.wallet-btn').forEach(btn => {
+        btn.style.display = 'block';
+      });
     }
 
     function createStars() {
       const starsContainer = document.getElementById('stars');
-      for (let i = 0; i < 100; i++) {
-        const star = document.createElement('div');
-        star.classList.add('star');
-        star.style.left = `${Math.random() * 100}%`;
-        star.style.top = `${Math.random() * 100}%`;
-        star.style.width = `${Math.random() * 3 + 1}px`;
-        star.style.height = star.style.width;
-        star.style.animationDelay = `${Math.random() * 3}s`;
-        star.style.animationDuration = `${Math.random() * 30 + 20}s`;
-        starsContainer.appendChild(star);
-      }
-    }
-
-    function setupWalletConnections() {
-      const walletButtons = document.querySelectorAll('.wallet-btn');
-      const walletAddresses = document.querySelectorAll('.wallet-address');
-
-      walletButtons.forEach(btn => {
-        btn.addEventListener('click', async () => {
-          try {
-            if (!window.sdk?.wallet?.ethProvider) {
-              alert('Please open in Warpcast to connect wallet');
-              return;
-            }
-
-            provider = new ethers.BrowserProvider(window.sdk.wallet.ethProvider);
-            await provider.send("eth_requestAccounts", []);
-            signer = await provider.getSigner();
-            address = await signer.getAddress();
-
-            walletButtons.forEach(b => b.style.display = 'none');
-            walletAddresses.forEach(div => {
-              div.style.display = 'block';
-              div.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
-            });
-          } catch (error) {
-            console.error("Connection failed:", error);
-          }
-        });
-      });
+      starsContainer.innerHTML = '';
+      
+      setTimeout(() => {
+        for (let i = 0; i < 100; i++) {
+          const star = document.createElement('div');
+          star.classList.add('star');
+          star.style.left = `${Math.random() * 100}%`;
+          star.style.top = `${Math.random() * 100}%`;
+          star.style.width = `${Math.random() * 3 + 1}px`;
+          star.style.height = star.style.width;
+          star.style.animationDelay = `${Math.random() * 3}s`;
+          star.style.animationDuration = `${Math.random() * 30 + 20}s`;
+          star.style.opacity = '0.3';
+          starsContainer.appendChild(star);
+        }
+      }, 500);
     }
 
     function showPage(pageId) {
