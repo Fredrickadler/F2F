@@ -8,7 +8,7 @@
   <!-- Farcaster Meta -->
   <meta name="fc:frame" content='{
     "version":"next",
-    "imageUrl":"https://i.imgur.com/UxZ1DqS_d.webp?maxwidth=1520&fidelity=grand",
+    "imageUrl":"https://i.imgur.com/dDpcwCa.jpeg",
     "button":{
       "title":"Liky Mini App",
       "action":{
@@ -604,89 +604,6 @@
     .submit-btn.error { background: var(--error); }
     .submit-btn.success { background: var(--success); }
 
-    /* Tutorial Overlay */
-    .tutorial-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 15, 15, 0.9);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      padding: 20px;
-    }
-
-    .tutorial-content {
-      background: var(--gray-800);
-      border-radius: 16px;
-      padding: 30px;
-      max-width: 500px;
-      width: 100%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .tutorial-title {
-      font-size: 24px;
-      margin-bottom: 20px;
-      text-align: center;
-      color: var(--primary);
-    }
-
-    .rule-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid var(--gray-700);
-    }
-
-    .rule-checkbox {
-      width: 24px;
-      height: 24px;
-      border: 2px solid var(--gray-400);
-      border-radius: 4px;
-      margin-right: 15px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
-      flex-shrink: 0;
-    }
-
-    .rule-checkbox.checked {
-      background: var(--success);
-      border-color: var(--success);
-    }
-
-    .rule-checkbox.checked::after {
-      content: "✓";
-      color: white;
-      font-size: 16px;
-    }
-
-    .tutorial-submit {
-      background: var(--primary);
-      color: white;
-      border: none;
-      width: 100%;
-      padding: 15px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-top: 20px;
-      display: none;
-    }
-
-    .tutorial-submit.active { display: block; }
-    .tutorial-submit:hover { background: var(--primary-dark); }
-
     @media (max-width: 768px) {
       .post-image-container { height: 300px; }
       .profile-avatar { width: 100px; height: 100px; }
@@ -963,38 +880,6 @@
     </div>
   </div>
 
-  <!-- Tutorial Overlay -->
-  <div class="tutorial-overlay" id="tutorial-overlay">
-    <div class="tutorial-content">
-      <h2 class="tutorial-title">Before You Start</h2>
-      
-      <div class="rule-item">
-        <div class="rule-checkbox" id="rule1-checkbox" onclick="toggleRule(1)"></div>
-        <div class="rule-text">
-          You must have at least 20 followers to participate
-        </div>
-      </div>
-      
-      <div class="rule-item">
-        <div class="rule-checkbox" id="rule2-checkbox" onclick="toggleRule(2)"></div>
-        <div class="rule-text">
-          Don't interact too much to avoid being flagged as a bot
-        </div>
-      </div>
-      
-      <div class="rule-item">
-        <div class="rule-checkbox" id="rule3-checkbox" onclick="toggleRule(3)"></div>
-        <div class="rule-text">
-          I confirm that I'm a real human user
-        </div>
-      </div>
-      
-      <button class="tutorial-submit" id="tutorial-submit-btn" onclick="closeTutorial()">
-        I Understand, Let's Start
-      </button>
-    </div>
-  </div>
-
   <script type="module">
     import sdk from 'https://esm.sh/@farcaster/frame-sdk';
 
@@ -1003,7 +888,6 @@
     let previousPage = 'home-page';
     let currentOrder = null;
 
-    // Initialize App
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         await sdk.actions.ready();
@@ -1013,10 +897,6 @@
         initializeApp();
         document.body.style.opacity = 1;
         document.getElementById('loading').style.display = 'none';
-        
-        if (!localStorage.getItem('tutorialAccepted')) {
-          document.getElementById('tutorial-overlay').style.display = 'flex';
-        }
       } catch (error) {
         console.error("Initialization Error:", error);
         document.getElementById('loading').style.display = 'none';
@@ -1027,9 +907,17 @@
     function initializeApp() {
       createStars();
       setupWalletConnections();
+      
+      // Expose functions to global scope
+      window.showPage = showPage;
+      window.goBack = goBack;
+      window.skipPost = skipPost;
+      window.viewPost = viewPost;
+      window.likePost = likePost;
+      window.startOrder = startOrder;
+      window.submitOrder = submitOrder;
     }
 
-    // Star Animation
     function createStars() {
       const starsContainer = document.getElementById('stars');
       for (let i = 0; i < 100; i++) {
@@ -1045,25 +933,28 @@
       }
     }
 
-    // Wallet Connections
     function setupWalletConnections() {
-      document.querySelectorAll('.wallet-btn').forEach(btn => {
+      const walletButtons = document.querySelectorAll('.wallet-btn');
+      const walletAddresses = document.querySelectorAll('.wallet-address');
+
+      walletButtons.forEach(btn => {
         btn.addEventListener('click', async () => {
           try {
-            if (window.sdk?.wallet?.ethProvider) {
-              provider = new ethers.BrowserProvider(window.sdk.wallet.ethProvider);
-              await provider.send("eth_requestAccounts", []);
-              signer = await provider.getSigner();
-              address = await signer.getAddress();
-
-              document.querySelectorAll('.wallet-btn').forEach(b => b.style.display = 'none');
-              document.querySelectorAll('.wallet-address').forEach(div => {
-                div.style.display = 'block';
-                div.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
-              });
-            } else {
+            if (!window.sdk?.wallet?.ethProvider) {
               alert('Please open in Warpcast to connect wallet');
+              return;
             }
+
+            provider = new ethers.BrowserProvider(window.sdk.wallet.ethProvider);
+            await provider.send("eth_requestAccounts", []);
+            signer = await provider.getSigner();
+            address = await signer.getAddress();
+
+            walletButtons.forEach(b => b.style.display = 'none');
+            walletAddresses.forEach(div => {
+              div.style.display = 'block';
+              div.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+            });
           } catch (error) {
             console.error("Connection failed:", error);
           }
@@ -1071,7 +962,6 @@
       });
     }
 
-    // Page Navigation
     function showPage(pageId) {
       previousPage = currentPage;
       currentPage = pageId;
@@ -1090,12 +980,10 @@
       showPage(previousPage);
     }
 
-    // Post Actions
     function skipPost() { alert('Post skipped! Loading next...'); }
     function viewPost() { window.open('https://warpcast.com/faruser1/0x0a6d75f4', '_blank'); }
     function likePost() { confirm('Did you like this post?') ? alert('+1 COIN!') : alert('Please like first!'); }
 
-    // Order System
     function startOrder(type, coins, inputType) {
       if (!address) return alert('Connect wallet first!');
       
@@ -1130,24 +1018,6 @@
         submitBtn.textContent = 'Confirm Order';
         submitBtn.classList.remove('success');
       }, 2000);
-    }
-
-    // Tutorial System
-    function toggleRule(ruleNumber) {
-      const checkbox = document.getElementById(`rule${ruleNumber}-checkbox`);
-      checkbox.classList.toggle('checked');
-      
-      const allAccepted = Array.from(document.querySelectorAll('.rule-checkbox'))
-        .every(cb => cb.classList.contains('checked'));
-      
-      document.getElementById('tutorial-submit-btn').classList.toggle('active', allAccepted);
-    }
-
-    function closeTutorial() {
-      if (document.getElementById('tutorial-submit-btn').classList.contains('active')) {
-        document.getElementById('tutorial-overlay').style.display = 'none';
-        localStorage.setItem('tutorialAccepted', 'true');
-      }
     }
   </script>
 </body>
