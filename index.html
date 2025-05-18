@@ -5,28 +5,197 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FarKaster</title>
 
-  <!-- Farcaster Meta -->
-  <meta name="fc:frame" content='{
-    "version":"next",
-    "imageUrl":"https://i.imgur.com/dDpcwCa_d.webp?maxwidth=1520&fidelity=grand",
-    "button":{
-      "title":"Liky Mini App",
-      "action":{
-        "type":"launch_frame",
-        "url":"https://liky-omega.vercel.app",
-        "name":"Liky!",
-        "splashImageUrl":"https://i.imgur.com/nyI4nlz_d.webp?maxwidth=1520&fidelity=grand",
-        "splashBackgroundColor":"#2E2E2E"
+  <meta property="fc:frame" content="vNext" />
+  <meta property="fc:frame:image" content="https://i.imgur.com/Qrx4yWZ_d.webp" />
+  <meta property="fc:frame:button:1" content="Liky…!" />
+  <meta property="fc:frame:button:1:action" content="post_redirect" />
+  <meta property="fc:frame:post_url" content="https://liky-omega.vercel.app/api/frame" />
+
+  <script type="module">
+    import sdk from "https://esm.sh/@farcaster/frame-sdk";
+
+    const NEYNAR_API_KEY = "D8460DB2-32C8-45E0-8C56-0ACB0FE02C29";
+    
+    let provider = null;
+    let address = null;
+    let currentPage = 'home-page';
+    let previousPage = 'home-page';
+    let currentOrder = null;
+    let isConnected = false;
+    let currentUsername = '@user';
+
+    async function loadUserProfile() {
+      const loadingElement = document.getElementById('profile-loading');
+      const avatarElement = document.getElementById('profile-avatar');
+      const usernameElement = document.getElementById('profile-username');
+      const postTitleElement = document.getElementById('post-title');
+      
+      try {
+        loadingElement.style.display = 'block';
+        avatarElement.style.display = 'none';
+        usernameElement.textContent = '';
+
+        const context = await sdk.context;
+        const user = context?.user;
+
+        if (!user?.fid) throw new Error('No user');
+
+        const fallbackUsername = user.username || `fid:${user.fid}`;
+        const fallbackPfp = user.pfpUrl || 'https://i.imgur.com/UH3IPXw.png';
+
+        try {
+          const neynarResponse = await fetch("https://api.neynar.com/v2/farcaster/user/bulk", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "api_key": NEYNAR_API_KEY
+            },
+            body: JSON.stringify({ fids: [user.fid] })
+          });
+          const neynarData = await neynarResponse.json();
+          const profile = neynarData.users?.[0];
+
+          if (profile) {
+            avatarElement.src = profile.pfp_url;
+            usernameElement.textContent = `@${profile.username}`;
+            currentUsername = `@${profile.username}`;
+          } else throw new Error('No data');
+        } catch {
+          avatarElement.src = fallbackPfp;
+          usernameElement.textContent = `@${fallbackUsername}`;
+          currentUsername = `@${fallbackUsername}`;
+        }
+
+        postTitleElement.textContent = currentUsername;
+        avatarElement.style.display = 'block';
+        loadingElement.style.display = 'none';
+      } catch {
+        loadingElement.textContent = 'Loading error';
+        loadingElement.style.display = 'block';
+        avatarElement.style.display = 'none';
       }
     }
-  }' />
 
-  <!-- Farcaster SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@farcaster/frame-sdk"></script>
-  
-  <!-- Other Dependencies -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await sdk.actions.ready();
+        document.body.style.opacity = 1;
+        document.getElementById('global-loading').style.display = 'none';
+        initializeApp();
+        loadUserProfile();
+      } catch {
+        document.getElementById('global-loading').textContent = 'Open in Warpcast';
+      }
+    });
+
+    function initializeApp() {
+      createStars();
+      window.showPage = showPage;
+      window.goBack = goBack;
+      window.skipPost = skipPost;
+      window.viewPost = viewPost;
+      window.likePost = likePost;
+      window.startOrder = startOrder;
+      window.submitOrder = submitOrder;
+      window.toggleWallet = toggleWallet;
+    }
+
+    function showPage(pageId) {
+      previousPage = currentPage;
+      currentPage = pageId;
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      if (['home-page','leaderboard-page','profile-page'].includes(pageId)) {
+        document.querySelector(`.tab-btn[onclick="showPage('${pageId}')"]`).classList.add('active');
+      }
+      if (pageId === "profile-page") loadUserProfile();
+    }
+
+    function createStars() {
+      const starsContainer = document.getElementById('stars');
+      starsContainer.innerHTML = '';
+      setTimeout(() => {
+        for (let i = 0; i < 100; i++) {
+          const star = document.createElement('div');
+          star.classList.add('star');
+          star.style.left = `${Math.random() * 100}%`;
+          star.style.top = `${Math.random() * 100}%`;
+          star.style.width = `${Math.random() * 3 + 1}px`;
+          star.style.height = star.style.width;
+          star.style.animationDelay = `${Math.random() * 3}s`;
+          star.style.animationDuration = `${Math.random() * 30 + 20}s`;
+          star.style.opacity = '0.3';
+          starsContainer.appendChild(star);
+        }
+      }, 500);
+    }
+
+    async function toggleWallet() {
+      if (isConnected) {
+        provider = null;
+        address = null;
+        isConnected = false;
+        document.querySelectorAll('.wallet-address').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.wallet-btn').forEach(btn => btn.style.display = 'block');
+      } else {
+        try {
+          if (!sdk.wallet?.ethProvider) {
+            alert('Open in Warpcast');
+            return;
+          }
+          provider = sdk.wallet.ethProvider;
+          const accounts = await provider.request({ method: 'eth_requestAccounts' });
+          address = accounts[0];
+          isConnected = true;
+          document.querySelectorAll('.wallet-address').forEach(el => {
+            el.textContent = `${address.slice(0,6)}...${address.slice(-4)}`;
+            el.style.display = 'block';
+          });
+          document.querySelectorAll('.wallet-btn').forEach(btn => btn.style.display = 'none');
+        } catch (error) {
+          console.error("Wallet error:", error);
+        }
+      }
+    }
+
+    function goBack() { showPage(previousPage); }
+    function skipPost() { alert('Skipping...'); }
+    function viewPost() { window.open('https://warpcast.com/faruser1/0x0a6d75f4', '_blank'); }
+    function likePost() { confirm('Liked?') ? alert('+1 COIN!') : alert('Like first!'); }
+
+    function startOrder(type, coins, inputType) {
+      if (!address) return alert('Connect wallet!');
+      currentOrder = { type, coins, inputType };
+      document.getElementById('order-form-title').textContent = `Order: ${type}`;
+      document.getElementById('package-name').value = type;
+      document.getElementById('package-price').value = `${coins} COINS`;
+      document.getElementById('wallet-address').value = address;
+      document.getElementById('order-link-label').textContent = inputType === 'post' ? 'Post Link' : 'Profile Link';
+      showPage('order-form-page');
+    }
+
+    function submitOrder() {
+      const link = document.getElementById('order-link').value.trim();
+      const btn = document.getElementById('submit-order-btn');
+      if (!link) {
+        btn.textContent = 'Invalid Link!';
+        btn.classList.add('error');
+        setTimeout(() => {
+          btn.textContent = 'Confirm Order';
+          btn.classList.remove('error');
+        }, 2000);
+        return;
+      }
+      btn.textContent = 'Submitted!';
+      btn.classList.add('success');
+      setTimeout(() => {
+        showPage('profile-page');
+        btn.textContent = 'Confirm Order';
+        btn.classList.remove('success');
+      }, 2000);
+    }
+  </script>
 
   <style>
     :root {
@@ -598,6 +767,14 @@
     .submit-btn.error { background: var(--error); }
     .submit-btn.success { background: var(--success); }
 
+    #profile-loading {
+      padding: 20px;
+      text-align: center;
+      color: var(--gray-400);
+      font-size: 16px;
+      display: none;
+    }
+
     @media (max-width: 768px) {
       .post-image-container { height: 300px; }
       .profile-avatar { width: 100px; height: 100px; }
@@ -607,15 +784,12 @@
   </style>
 </head>
 <body>
-  <!-- Loading Screen -->
-  <div class="loading-overlay" id="loading">
+  <div class="loading-overlay" id="global-loading">
     <div class="loading-spinner"></div>
   </div>
 
-  <!-- Star Animation -->
   <div class="stars" id="stars"></div>
 
-  <!-- Home Page -->
   <div class="page active" id="home-page">
     <div class="header">
       <div class="add-order-btn" onclick="showPage('order-page')">
@@ -624,14 +798,14 @@
       <button class="wallet-btn" onclick="toggleWallet()">
         <i class="fas fa-wallet"></i> Connect Wallet
       </button>
-      <div class="wallet-address" id="walletAddress" onclick="toggleWallet()"></div>
+      <div class="wallet-address" id="walletAddress"></div>
     </div>
     
     <div class="post-container">
       <div class="post-image-container">
         <img src="https://i.imgur.com/muoYEIu.jpeg" class="post-image" alt="Post">
         <div class="post-overlay">
-          <h3 class="post-title">@faruser1</h3>
+          <h3 class="post-title" id="post-title">@user</h3>
           <p class="post-description">Like this post to earn 1 COIN. Verify after liking.</p>
         </div>
       </div>
@@ -663,7 +837,6 @@
     </div>
   </div>
 
-  <!-- Leaderboard Page -->
   <div class="page" id="leaderboard-page">
     <div class="header">
       <div class="add-order-btn" onclick="showPage('order-page')">
@@ -672,7 +845,7 @@
       <button class="wallet-btn" onclick="toggleWallet()">
         <i class="fas fa-wallet"></i> Connect Wallet
       </button>
-      <div class="wallet-address" id="walletAddress2" onclick="toggleWallet()"></div>
+      <div class="wallet-address" id="walletAddress2"></div>
     </div>
     
     <div class="post-container">
@@ -712,7 +885,6 @@
     </div>
   </div>
 
-  <!-- Profile Page -->
   <div class="page" id="profile-page">
     <div class="header">
       <div class="add-order-btn" onclick="showPage('order-page')">
@@ -721,12 +893,13 @@
       <button class="wallet-btn" onclick="toggleWallet()">
         <i class="fas fa-wallet"></i> Connect Wallet
       </button>
-      <div class="wallet-address" id="walletAddress3" onclick="toggleWallet()"></div>
+      <div class="wallet-address" id="walletAddress3"></div>
     </div>
     
     <div class="profile-content">
-      <img src="https://i.imgur.com/ABCD5678.jpg" class="profile-avatar" alt="Profile">
-      <div class="profile-username">@yourusername</div>
+      <div id="profile-loading">Loading...</div>
+      <img id="profile-avatar" class="profile-avatar" alt="Profile" style="display: none;">
+      <div id="profile-username" class="profile-username"></div>
       
       <div class="profile-stats">
         <div class="stat-item">
@@ -763,7 +936,6 @@
     </div>
   </div>
 
-  <!-- Order Page -->
   <div class="page" id="order-page">
     <div class="header">
       <button class="back-btn" onclick="goBack()">
@@ -772,7 +944,7 @@
       <button class="wallet-btn" onclick="toggleWallet()">
         <i class="fas fa-wallet"></i> Connect Wallet
       </button>
-      <div class="wallet-address" id="walletAddress4" onclick="toggleWallet()"></div>
+      <div class="wallet-address" id="walletAddress4"></div>
     </div>
     
     <div class="packages-container">
@@ -817,7 +989,6 @@
     </div>
   </div>
 
-  <!-- Order Form Page -->
   <div class="page" id="order-form-page">
     <div class="header">
       <button class="back-btn" onclick="showPage('order-page')">
@@ -826,7 +997,7 @@
       <button class="wallet-btn" onclick="toggleWallet()">
         <i class="fas fa-wallet"></i> Connect Wallet
       </button>
-      <div class="wallet-address" id="walletAddress5" onclick="toggleWallet()"></div>
+      <div class="wallet-address" id="walletAddress5"></div>
     </div>
     
     <div class="order-form-container">
@@ -835,6 +1006,14 @@
       <div class="form-group">
         <label class="form-label" id="order-link-label">Post Link</label>
         <input type="text" class="form-input" id="order-link" placeholder="https://warpcast.com/yourusername/0x123456">
+      </div>
+
+      <div class="order-item" id="verified-post" style="display:none; margin-top: 20px;">
+        <div class="order-type" id="verified-post-title">@username</div>
+        <div class="order-details">
+          <span id="verified-post-text">Post text...</span><br>
+          <img id="verified-post-img" src="" style="width:100%; margin-top:10px; border-radius:8px;" />
+        </div>
       </div>
       
       <div class="form-group">
@@ -858,7 +1037,6 @@
     </div>
   </div>
 
-  <!-- Tab Bar -->
   <div class="tab-bar">
     <div class="tab-btn active" onclick="showPage('home-page')">
       <i class="fas fa-home"></i>
@@ -874,162 +1052,6 @@
     </div>
   </div>
 
-  <script type="module">
-    import sdk from 'https://esm.sh/@farcaster/frame-sdk';
-
-    let provider, address;
-    let currentPage = 'home-page';
-    let previousPage = 'home-page';
-    let currentOrder = null;
-    let isConnected = false;
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      try {
-        await sdk.actions.ready();
-        document.body.style.opacity = 1;
-        document.getElementById('loading').style.display = 'none';
-        initializeApp();
-      } catch (error) {
-        console.error("Initialization Error:", error);
-        document.getElementById('loading').style.display = 'none';
-        document.body.innerHTML = `<div class="error">Failed to initialize. Please refresh.</div>`;
-      }
-    });
-
-    function initializeApp() {
-      createStars();
-      window.showPage = showPage;
-      window.goBack = goBack;
-      window.skipPost = skipPost;
-      window.viewPost = viewPost;
-      window.likePost = likePost;
-      window.startOrder = startOrder;
-      window.submitOrder = submitOrder;
-      window.toggleWallet = toggleWallet;
-    }
-
-    async function toggleWallet() {
-      if (isConnected) {
-        disconnectWallet();
-      } else {
-        await connectWallet();
-      }
-    }
-
-    async function connectWallet() {
-      try {
-        if (!sdk.wallet?.ethProvider) {
-          alert('Please open in Warpcast to connect wallet');
-          return;
-        }
-
-        provider = sdk.wallet.ethProvider;
-        const accounts = await provider.request({ method: 'eth_requestAccounts' });
-        address = accounts[0];
-        isConnected = true;
-
-        document.querySelectorAll('.wallet-address').forEach(el => {
-          el.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
-          el.style.display = 'block';
-        });
-
-        document.querySelectorAll('.wallet-btn').forEach(btn => {
-          btn.style.display = 'none';
-        });
-
-      } catch (error) {
-        console.error("Wallet connection failed:", error);
-      }
-    }
-
-    function disconnectWallet() {
-      isConnected = false;
-      address = null;
-      document.querySelectorAll('.wallet-address').forEach(el => {
-        el.style.display = 'none';
-      });
-      document.querySelectorAll('.wallet-btn').forEach(btn => {
-        btn.style.display = 'block';
-      });
-    }
-
-    function createStars() {
-      const starsContainer = document.getElementById('stars');
-      starsContainer.innerHTML = '';
-      
-      setTimeout(() => {
-        for (let i = 0; i < 100; i++) {
-          const star = document.createElement('div');
-          star.classList.add('star');
-          star.style.left = `${Math.random() * 100}%`;
-          star.style.top = `${Math.random() * 100}%`;
-          star.style.width = `${Math.random() * 3 + 1}px`;
-          star.style.height = star.style.width;
-          star.style.animationDelay = `${Math.random() * 3}s`;
-          star.style.animationDuration = `${Math.random() * 30 + 20}s`;
-          star.style.opacity = '0.3';
-          starsContainer.appendChild(star);
-        }
-      }, 500);
-    }
-
-    function showPage(pageId) {
-      previousPage = currentPage;
-      currentPage = pageId;
-      
-      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      
-      document.getElementById(pageId).classList.add('active');
-      
-      if (['home-page', 'leaderboard-page', 'profile-page'].includes(pageId)) {
-        document.querySelector(`.tab-btn[onclick="showPage('${pageId}')"]`).classList.add('active');
-      }
-    }
-
-    function goBack() {
-      showPage(previousPage);
-    }
-
-    function skipPost() { alert('Post skipped! Loading next...'); }
-    function viewPost() { window.open('https://warpcast.com/faruser1/0x0a6d75f4', '_blank'); }
-    function likePost() { confirm('Did you like this post?') ? alert('+1 COIN!') : alert('Please like first!'); }
-
-    function startOrder(type, coins, inputType) {
-      if (!address) return alert('Connect wallet first!');
-      
-      currentOrder = { type, coins, inputType };
-      document.getElementById('order-form-title').textContent = `Order: ${type}`;
-      document.getElementById('package-name').value = type;
-      document.getElementById('package-price').value = `${coins} COINS`;
-      document.getElementById('wallet-address').value = address;
-      
-      document.getElementById('order-link-label').textContent = inputType === 'post' ? 'Post Link' : 'Profile Link';
-      showPage('order-form-page');
-    }
-
-    function submitOrder() {
-      const link = document.getElementById('order-link').value.trim();
-      const submitBtn = document.getElementById('submit-order-btn');
-      
-      if (!link) {
-        submitBtn.textContent = 'Invalid link!';
-        submitBtn.classList.add('error');
-        setTimeout(() => {
-          submitBtn.textContent = 'Confirm Order';
-          submitBtn.classList.remove('error');
-        }, 2000);
-        return;
-      }
-      
-      submitBtn.textContent = 'Order Submitted!';
-      submitBtn.classList.add('success');
-      setTimeout(() => {
-        showPage('profile-page');
-        submitBtn.textContent = 'Confirm Order';
-        submitBtn.classList.remove('success');
-      }, 2000);
-    }
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 </body>
-</html> 
+</html>
